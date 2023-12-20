@@ -13,8 +13,8 @@ class App {
 	public static final String DB_USER = "jun31399";
 	public static final String DB_PASS = "jadmsfvhetgthtekjrjeuheasddoucqy";
 
-	public static final int SCREEN_WIDTH = 25;
-	public static final int SCREEN_HEIGHT = 15;
+	public static final int SCREEN_WIDTH = 35;
+	public static final int SCREEN_HEIGHT = 9;
 
 	public static Connection connection;
 
@@ -24,26 +24,6 @@ class App {
 	public static void main(String[] args) {
 		init();
 
-		// rendering tests
-		// for (int y = 0; y < 100; y++) {
-		// for (int x = 0; x < 1; x++) {
-		// render(x, y);
-		// try {
-		// Thread.sleep(50);
-		// } catch (InterruptedException e) {
-		// }
-		// }
-		// }
-
-		// fetching tests
-		// var pixels = fetch(0, CANVAS_WIDTH, 0, CANVAS_HEIGHT);
-		// for (var pixel : pixels) {
-		// System.out.println(pixel);
-		// }
-
-		// keypress callback tests
-		// onKeyPress(c -> System.out.println(c));
-
 		var position = new Object() {
 			int x = 0;
 			int y = 0;
@@ -51,6 +31,7 @@ class App {
 
 		onKeyPress(c -> {
 			switch (c) {
+				case 'q' -> System.exit(0);
 				case 'w' -> position.y--;
 				case 'a' -> position.x--;
 				case 's' -> position.y++;
@@ -130,7 +111,8 @@ class App {
 				pixels.add(pixel);
 			}
 		} catch (SQLException e) {
-			// TODO: handle exception
+			e.printStackTrace();
+			System.exit(1);
 		}
 
 		return pixels.toArray(new Pixel[pixels.size()]);
