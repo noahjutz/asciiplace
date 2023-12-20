@@ -25,9 +25,6 @@ class App {
 
 	public static Connection connection;
 
-	record A(int x) {
-	};
-
 	public static void main(String[] args) {
 		init();
 
