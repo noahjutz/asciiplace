@@ -39,18 +39,19 @@ class App {
 		};
 
 		onKeyPress(c -> {
-			if (c == 'i') {
+			var l = Character.toLowerCase(c);
+			if (l == 'i') {
 				data.isInsertMode = !data.isInsertMode;
 				return;
 			}
 
-			if (data.isInsertMode && !Character.isWhitespace(c)) {
+			if (data.isInsertMode && (!Character.isWhitespace(c) || c == ' ')) {
 				write(data.getPosition(), c);
 				data.isInsertMode = false;
 				return;
 			}
 
-			switch (c) {
+			switch (l) {
 				case 'q' -> System.exit(0);
 				case 'w' -> data.y--;
 				case 'a' -> data.x--;
@@ -174,7 +175,7 @@ class App {
 			while (true) {
 				try {
 					var c = (char) System.in.read();
-					callback.accept(Character.toLowerCase(c));
+					callback.accept(c);
 				} catch (IOException e) {
 					e.printStackTrace();
 					System.exit(1);
