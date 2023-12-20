@@ -40,7 +40,12 @@ class App {
 		});
 
 		while (true) {
-			render(position.x, position.y);
+			final var xMin = position.x - SCREEN_WIDTH / 2;
+			final var xMax = position.x + SCREEN_WIDTH / 2;
+			final var yMin = position.y - SCREEN_HEIGHT / 2;
+			final var yMax = position.y + SCREEN_HEIGHT / 2;
+
+			render(position.x, position.y, xMin, xMax, yMin, yMax);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -59,13 +64,8 @@ class App {
 		}
 	}
 
-	public static void render(int px, int py) {
+	public static void render(int px, int py, int xMin, int xMax, int yMin, int yMax) {
 		clear();
-
-		final var xMin = px - SCREEN_WIDTH / 2;
-		final var xMax = px + SCREEN_WIDTH / 2;
-		final var yMin = py - SCREEN_HEIGHT / 2;
-		final var yMax = py + SCREEN_HEIGHT / 2;
 
 		for (int y = yMin; y < yMax; y++) {
 			for (int x = xMin; x < xMax; x++) {
