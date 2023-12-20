@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 record Position(int x, int y) {
@@ -46,13 +47,15 @@ class App {
 		});
 
 		while (true) {
-			var bounds = new Bounds(
+			final var bounds = new Bounds(
 					position.x - SCREEN_WIDTH / 2,
 					position.x + SCREEN_WIDTH / 2,
 					position.y - SCREEN_HEIGHT / 2,
 					position.y + SCREEN_HEIGHT / 2);
 
-			render(new Position(position.x, position.y), bounds);
+			final var pixels = fetch(bounds);
+
+			render(new Position(position.x, position.y), bounds, pixels);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -71,7 +74,7 @@ class App {
 		}
 	}
 
-	public static void render(Position player, Bounds bounds) {
+	public static void render(Position player, Bounds bounds, Pixel[] pixels) {
 		clear();
 
 		for (int y = bounds.yMin(); y < bounds.yMax(); y++) {
@@ -79,8 +82,14 @@ class App {
 				char c;
 				if (y == player.y() && x == player.x())
 					c = 'X';
-				else
-					c = y % 2 == 0 ? '.' : ','; // todo get from db
+				else {
+					c = Arrays.stream(pixels)
+							.filter(p -> p.x() == 0)
+							.findFirst()
+							.map(p -> p.c())
+							.orElse('.');
+				}
+				c = y % 2 == 0 ? '.' : ','; // todo get from db
 
 				System.out.print(c);
 			}
