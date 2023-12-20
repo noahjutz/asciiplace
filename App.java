@@ -155,7 +155,18 @@ class App {
 	}
 
 	public static void write(Position position, char c) {
-		// TODO
+		try (var st = connection.prepareStatement("""
+				INSERT INTO pixels (x, y, c) VALUES (?, ?, ?)
+				""")) {
+			System.out.println(c);
+			st.setInt(1, position.x());
+			st.setInt(2, position.y());
+			st.setObject(3, c);
+			st.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 	public static void onKeyPress(Consumer<Character> callback) {
