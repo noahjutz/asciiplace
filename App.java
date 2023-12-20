@@ -39,24 +39,19 @@ class App {
 		};
 
 		onKeyPress(c -> {
-			var l = Character.toLowerCase(c);
-			if (l == 'i') {
-				data.isInsertMode = !data.isInsertMode;
-				return;
-			}
-
 			if (data.isInsertMode && (!Character.isWhitespace(c) || c == ' ')) {
 				write(data.getPosition(), c);
 				data.isInsertMode = false;
 				return;
 			}
 
-			switch (l) {
+			switch (Character.toLowerCase(c)) {
 				case 'q' -> System.exit(0);
 				case 'w' -> data.y--;
 				case 'a' -> data.x--;
 				case 's' -> data.y++;
 				case 'd' -> data.x++;
+				case 'i' -> data.isInsertMode = true;
 			}
 		});
 
