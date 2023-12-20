@@ -5,7 +5,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+record Position(int x, int y) {
+}
+
 record Pixel(int x, int y, char c) {
+}
+
+record Bounds(int xMin, int xMax, int yMin, int yMax) {
 }
 
 class App {
@@ -40,12 +46,13 @@ class App {
 		});
 
 		while (true) {
-			final var xMin = position.x - SCREEN_WIDTH / 2;
-			final var xMax = position.x + SCREEN_WIDTH / 2;
-			final var yMin = position.y - SCREEN_HEIGHT / 2;
-			final var yMax = position.y + SCREEN_HEIGHT / 2;
+			var bounds = new Bounds(
+					position.x - SCREEN_WIDTH / 2,
+					position.x + SCREEN_WIDTH / 2,
+					position.y - SCREEN_HEIGHT / 2,
+					position.y + SCREEN_HEIGHT / 2);
 
-			render(position.x, position.y, xMin, xMax, yMin, yMax);
+			render(new Position(position.x, position.y), bounds);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -64,16 +71,16 @@ class App {
 		}
 	}
 
-	public static void render(int px, int py, int xMin, int xMax, int yMin, int yMax) {
+	public static void render(Position player, Bounds bounds) {
 		clear();
 
-		for (int y = yMin; y < yMax; y++) {
-			for (int x = xMin; x < xMax; x++) {
+		for (int y = bounds.yMin(); y < bounds.yMax(); y++) {
+			for (int x = bounds.xMin(); x < bounds.xMax(); x++) {
 				char c;
-				if (y == py && x == px)
+				if (y == player.y() && x == player.x())
 					c = 'X';
 				else
-					c = '.'; // todo get from db
+					c = y % 2 == 0 ? '.' : ','; // todo get from db
 
 				System.out.print(c);
 			}
@@ -85,7 +92,7 @@ class App {
 		System.out.print("\033[H\033[2J");
 	}
 
-	public static Pixel[] fetch(int xMin, int xMax, int yMin, int yMax) {
+	public static Pixel[] fetch(Bounds bounds) {
 		var pixels = new ArrayList<Record>();
 
 		try (var st = connection.prepareStatement("""
@@ -97,10 +104,10 @@ class App {
 				AND y < ?
 				ORDER BY x, y, created_at DESC;
 				""")) {
-			st.setInt(1, xMin);
-			st.setInt(2, xMax);
-			st.setInt(3, yMin);
-			st.setInt(4, yMax);
+			st.setInt(1, bounds.xMin());
+			st.setInt(2, bounds.xMax());
+			st.setInt(3, bounds.yMin());
+			st.setInt(4, bounds.yMax());
 			var rs = st.executeQuery();
 			while (rs.next()) {
 				final var x = rs.getInt(1);
