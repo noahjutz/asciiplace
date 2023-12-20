@@ -70,13 +70,7 @@ class App {
 					data.y + SCREEN_HEIGHT / 2);
 
 			final var pixels = fetch(bounds);
-
 			render(data.getPosition(), bounds, pixels);
-
-			System.out.println(data.getPosition());
-			System.out.println(bounds);
-			for (var pixel : pixels)
-				System.out.println(pixel);
 
 			try {
 				Thread.sleep(100);
