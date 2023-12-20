@@ -31,31 +31,53 @@ class App {
 	public static void main(String[] args) {
 		init();
 
-		var position = new Object() {
+		var data = new Object() {
 			int x = 0;
 			int y = 0;
+			boolean isInsertMode = false;
+
+			public Position getPosition() {
+				return new Position(x, y);
+			}
 		};
 
 		onKeyPress(c -> {
+			if (c == 'i') {
+				data.isInsertMode = !data.isInsertMode;
+				return;
+			}
+
+			if (data.isInsertMode) {
+				write(data.getPosition(), c);
+				data.isInsertMode = true;
+				return;
+			}
+
 			switch (c) {
 				case 'q' -> System.exit(0);
-				case 'w' -> position.y--;
-				case 'a' -> position.x--;
-				case 's' -> position.y++;
-				case 'd' -> position.x++;
+				case 'w' -> data.y--;
+				case 'a' -> data.x--;
+				case 's' -> data.y++;
+				case 'd' -> data.x++;
 			}
 		});
 
 		while (true) {
 			final var bounds = new Bounds(
-					position.x - SCREEN_WIDTH / 2,
-					position.x + SCREEN_WIDTH / 2,
-					position.y - SCREEN_HEIGHT / 2,
-					position.y + SCREEN_HEIGHT / 2);
+					data.x - SCREEN_WIDTH / 2,
+					data.x + SCREEN_WIDTH / 2,
+					data.y - SCREEN_HEIGHT / 2,
+					data.y + SCREEN_HEIGHT / 2);
 
 			final var pixels = fetch(bounds);
 
-			render(new Position(position.x, position.y), bounds, pixels);
+			render(data.getPosition(), bounds, pixels);
+
+			System.out.println(data.getPosition());
+			System.out.println(bounds);
+			for (var pixel : pixels)
+				System.out.println(pixel);
+
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -83,13 +105,14 @@ class App {
 				if (y == player.y() && x == player.x())
 					c = 'X';
 				else {
+					final int x1 = x;
+					final int y1 = y;
 					c = Arrays.stream(pixels)
-							.filter(p -> p.x() == 0)
+							.filter(p -> p.x() == x1 && p.y() == y1)
 							.findFirst()
 							.map(p -> p.c())
-							.orElse('.');
+							.orElse(' ');
 				}
-				c = y % 2 == 0 ? '.' : ','; // todo get from db
 
 				System.out.print(c);
 			}
@@ -132,6 +155,10 @@ class App {
 		}
 
 		return pixels.toArray(new Pixel[pixels.size()]);
+	}
+
+	public static void write(Position position, char c) {
+		// TODO
 	}
 
 	public static void onKeyPress(Consumer<Character> callback) {
