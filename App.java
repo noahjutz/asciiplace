@@ -44,9 +44,9 @@ class App {
 				return;
 			}
 
-			if (data.isInsertMode) {
+			if (data.isInsertMode && !Character.isWhitespace(c)) {
 				write(data.getPosition(), c);
-				data.isInsertMode = true;
+				data.isInsertMode = false;
 				return;
 			}
 
@@ -67,7 +67,13 @@ class App {
 					data.y + SCREEN_HEIGHT / 2);
 
 			final var pixels = fetch(bounds);
-			render(data.getPosition(), bounds, pixels);
+
+			if (data.isInsertMode) {
+				clear();
+				System.out.println("Enter a character and press enter.");
+			} else {
+				render(data.getPosition(), bounds, pixels);
+			}
 
 			try {
 				Thread.sleep(100);
