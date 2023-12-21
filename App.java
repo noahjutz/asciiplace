@@ -51,7 +51,7 @@ class App {
 		onKeyPress(c -> {
 			if (data.isInsertMode && (c.toString().matches("\\S| "))) {
 				try {
-					write(data.getPosition(), c);
+					insertPixel(data.getPosition(), c);
 				} catch (SQLException e) {
 					e.printStackTrace();
 					System.exit(1);
@@ -77,7 +77,7 @@ class App {
 					data.y - Env.SCREEN_HEIGHT / 2,
 					data.y + Env.SCREEN_HEIGHT / 2);
 
-			final var pixels = fetch(bounds);
+			final var pixels = fetchPixels(bounds);
 			render(data.getPosition(), bounds, pixels);
 
 			if (data.isInsertMode)
@@ -93,7 +93,7 @@ class App {
 	}
 
 	static void render(Position playerPos, Bounds bounds, Pixel[] pixels) {
-		clear();
+		clearScreen();
 
 		for (int y = bounds.yMin(); y < bounds.yMax(); y++) {
 			for (int x = bounds.xMin(); x < bounds.xMax(); x++) {
@@ -106,11 +106,11 @@ class App {
 		}
 	}
 
-	static void clear() {
+	static void clearScreen() {
 		System.out.print("\033[H\033[2J");
 	}
 
-	static Pixel[] fetch(Bounds bounds) throws SQLException {
+	static Pixel[] fetchPixels(Bounds bounds) throws SQLException {
 		var pixels = new ArrayList<Record>();
 
 		var st = connection.prepareStatement("""
@@ -141,7 +141,7 @@ class App {
 		return pixels.toArray(new Pixel[pixels.size()]);
 	}
 
-	static void write(Position position, char c) throws SQLException {
+	static void insertPixel(Position position, char c) throws SQLException {
 		var st = connection.prepareStatement("INSERT INTO pixels (x, y, c) VALUES (?, ?, ?)");
 		System.out.println(c);
 		st.setInt(1, position.x());
