@@ -130,10 +130,15 @@ class App {
 		st.setInt(2, bounds.xMax());
 		st.setInt(3, bounds.yMin());
 		st.setInt(4, bounds.yMax());
-
 		var rs = st.executeQuery();
-		while (rs.next())
-			pixels.add(new Pixel(rs.getInt(1), rs.getInt(2), rs.getString(3).charAt(0)));
+
+		while (rs.next()) {
+			final var x = rs.getInt(1);
+			final var y = rs.getInt(2);
+			final var c = rs.getString(3).charAt(0);
+
+			pixels.add(new Pixel(x, y, c));
+		}
 
 		st.close();
 		rs.close();
