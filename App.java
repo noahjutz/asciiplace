@@ -18,7 +18,7 @@ class Env {
 record Position(int x, int y) {
 }
 
-record Pixel(Position p, char c) {
+record Pixel(Position position, char c) {
 }
 
 record Bounds(int xMin, int xMax, int yMin, int yMax) {
@@ -41,7 +41,7 @@ class App {
 		};
 
 		onKeyPress(c -> {
-			if (data.isInsertMode && (!Character.isWhitespace(c) || c == ' ')) {
+			if (data.isInsertMode && (c.toString().matches("\\S| "))) {
 				try {
 					write(data.getPosition(), c);
 				} catch (SQLException e) {
@@ -92,14 +92,15 @@ class App {
 
 		for (int y = bounds.yMin(); y < bounds.yMax(); y++) {
 			for (int x = bounds.xMin(); x < bounds.xMax(); x++) {
+				final var current = new Position(x, y);
+
 				char c = 'X';
 
-				if (y != player.y() || x != player.x()) {
-					final var pos = new Position(x, y);
+				if (!player.equals(current)) {
 					c = Arrays.stream(pixels)
-							.filter(pixel -> pixel.p().equals(pos))
+							.filter(pixel -> pixel.position().equals(current))
 							.findFirst()
-							.map(p -> p.c())
+							.map(pixel -> pixel.c())
 							.orElse(' ');
 				}
 
