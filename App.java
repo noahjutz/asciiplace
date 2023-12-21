@@ -70,13 +70,10 @@ class App {
 					data.y + Env.SCREEN_HEIGHT / 2);
 
 			final var pixels = fetch(bounds);
+			render(data.getPosition(), bounds, pixels);
 
-			if (data.isInsertMode) {
-				clear();
+			if (data.isInsertMode)
 				System.out.println("Enter a character and press enter.");
-			} else {
-				render(data.getPosition(), bounds, pixels);
-			}
 
 			try {
 				Thread.sleep(100);
