@@ -27,7 +27,7 @@ record Bounds(int xMin, int xMax, int yMin, int yMax) {
 class App {
 	static Connection connection;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 		init();
 
 		var data = new Object() {
@@ -42,7 +42,12 @@ class App {
 
 		onKeyPress(c -> {
 			if (data.isInsertMode && (!Character.isWhitespace(c) || c == ' ')) {
-				write(data.getPosition(), c);
+				try {
+					write(data.getPosition(), c);
+				} catch (SQLException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
 				data.isInsertMode = false;
 				return;
 			}
@@ -82,13 +87,8 @@ class App {
 		}
 	}
 
-	static void init() {
-		try {
-			connection = DriverManager.getConnection(Env.DB_URL, Env.DB_USER, Env.DB_PASS);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+	static void init() throws SQLException {
+		connection = DriverManager.getConnection(Env.DB_URL, Env.DB_USER, Env.DB_PASS);
 	}
 
 	static void render(Position player, Bounds bounds, Pixel[] pixels) {
@@ -119,10 +119,10 @@ class App {
 		System.out.print("\033[H\033[2J");
 	}
 
-	static Pixel[] fetch(Bounds bounds) {
+	static Pixel[] fetch(Bounds bounds) throws SQLException {
 		var pixels = new ArrayList<Record>();
 
-		try (var st = connection.prepareStatement("""
+		var st = connection.prepareStatement("""
 				SELECT DISTINCT ON (x, y) x, y, c
 				FROM pixels
 				WHERE x >= ?
@@ -130,41 +130,39 @@ class App {
 				AND y >= ?
 				AND y < ?
 				ORDER BY x, y, created_at DESC;
-				""")) {
-			st.setInt(1, bounds.xMin());
-			st.setInt(2, bounds.xMax());
-			st.setInt(3, bounds.yMin());
-			st.setInt(4, bounds.yMax());
-			var rs = st.executeQuery();
-			while (rs.next()) {
-				final var x = rs.getInt(1);
-				final var y = rs.getInt(2);
-				final var c = rs.getString(3).charAt(0);
+				""");
 
-				final var pixel = new Pixel(x, y, c);
-				pixels.add(pixel);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
+		st.setInt(1, bounds.xMin());
+		st.setInt(2, bounds.xMax());
+		st.setInt(3, bounds.yMin());
+		st.setInt(4, bounds.yMax());
+		var rs = st.executeQuery();
+		while (rs.next()) {
+			final var x = rs.getInt(1);
+			final var y = rs.getInt(2);
+			final var c = rs.getString(3).charAt(0);
+
+			final var pixel = new Pixel(x, y, c);
+			pixels.add(pixel);
 		}
+
+		st.close();
+		rs.close();
 
 		return pixels.toArray(new Pixel[pixels.size()]);
 	}
 
-	static void write(Position position, char c) {
-		try (var st = connection.prepareStatement("""
+	static void write(Position position, char c) throws SQLException {
+		var st = connection.prepareStatement("""
 				INSERT INTO pixels (x, y, c) VALUES (?, ?, ?)
-				""")) {
-			System.out.println(c);
-			st.setInt(1, position.x());
-			st.setInt(2, position.y());
-			st.setObject(3, c);
-			st.execute();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+				""");
+		System.out.println(c);
+		st.setInt(1, position.x());
+		st.setInt(2, position.y());
+		st.setObject(3, c);
+		st.execute();
+
+		st.close();
 	}
 
 	static void onKeyPress(Consumer<Character> callback) {
