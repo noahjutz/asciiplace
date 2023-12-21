@@ -25,8 +25,7 @@ record Bounds(int xMin, int xMax, int yMin, int yMax) {
 }
 
 class App {
-
-	public static Connection connection;
+	static Connection connection;
 
 	public static void main(String[] args) {
 		init();
@@ -83,7 +82,7 @@ class App {
 		}
 	}
 
-	public static void init() {
+	static void init() {
 		try {
 			connection = DriverManager.getConnection(Env.DB_URL, Env.DB_USER, Env.DB_PASS);
 		} catch (SQLException e) {
@@ -92,7 +91,7 @@ class App {
 		}
 	}
 
-	public static void render(Position player, Bounds bounds, Pixel[] pixels) {
+	static void render(Position player, Bounds bounds, Pixel[] pixels) {
 		clear();
 
 		for (int y = bounds.yMin(); y < bounds.yMax(); y++) {
@@ -116,11 +115,11 @@ class App {
 		}
 	}
 
-	public static void clear() {
+	static void clear() {
 		System.out.print("\033[H\033[2J");
 	}
 
-	public static Pixel[] fetch(Bounds bounds) {
+	static Pixel[] fetch(Bounds bounds) {
 		var pixels = new ArrayList<Record>();
 
 		try (var st = connection.prepareStatement("""
@@ -153,7 +152,7 @@ class App {
 		return pixels.toArray(new Pixel[pixels.size()]);
 	}
 
-	public static void write(Position position, char c) {
+	static void write(Position position, char c) {
 		try (var st = connection.prepareStatement("""
 				INSERT INTO pixels (x, y, c) VALUES (?, ?, ?)
 				""")) {
@@ -168,7 +167,7 @@ class App {
 		}
 	}
 
-	public static void onKeyPress(Consumer<Character> callback) {
+	static void onKeyPress(Consumer<Character> callback) {
 		new Thread(() -> {
 			while (true) {
 				try {
