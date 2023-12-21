@@ -28,7 +28,7 @@ class App {
 	static Connection connection;
 
 	public static void main(String[] args) throws SQLException {
-		init();
+		connection = DriverManager.getConnection(Env.DB_URL, Env.DB_USER, Env.DB_PASS);
 
 		var data = new Object() {
 			int x = 0;
@@ -85,10 +85,6 @@ class App {
 				System.exit(1);
 			}
 		}
-	}
-
-	static void init() throws SQLException {
-		connection = DriverManager.getConnection(Env.DB_URL, Env.DB_USER, Env.DB_PASS);
 	}
 
 	static void render(Position player, Bounds bounds, Pixel[] pixels) {
