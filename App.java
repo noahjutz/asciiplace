@@ -87,18 +87,18 @@ class App {
 		}
 	}
 
-	static void render(Position player, Bounds bounds, Pixel[] pixels) {
+	static void render(Position playerPos, Bounds bounds, Pixel[] pixels) {
 		clear();
 
 		for (int y = bounds.yMin(); y < bounds.yMax(); y++) {
 			for (int x = bounds.xMin(); x < bounds.xMax(); x++) {
-				final var current = new Position(x, y);
+				final var currentPos = new Position(x, y);
 
 				char c = 'X';
 
-				if (!player.equals(current)) {
+				if (!playerPos.equals(currentPos)) {
 					c = Arrays.stream(pixels)
-							.filter(pixel -> pixel.position().equals(current))
+							.filter(pixel -> pixel.position().equals(currentPos))
 							.findFirst()
 							.map(pixel -> pixel.c())
 							.orElse(' ');
