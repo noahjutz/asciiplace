@@ -18,7 +18,7 @@ class Env {
 record Position(int x, int y) {
 }
 
-record Pixel(int x, int y, char c) {
+record Pixel(Position p, char c) {
 }
 
 record Bounds(int xMin, int xMax, int yMin, int yMax) {
@@ -92,14 +92,12 @@ class App {
 
 		for (int y = bounds.yMin(); y < bounds.yMax(); y++) {
 			for (int x = bounds.xMin(); x < bounds.xMax(); x++) {
-				char c;
-				if (y == player.y() && x == player.x())
-					c = 'X';
-				else {
-					final int x1 = x;
-					final int y1 = y;
+				char c = 'X';
+
+				if (y != player.y() || x != player.x()) {
+					final var pos = new Position(x, y);
 					c = Arrays.stream(pixels)
-							.filter(p -> p.x() == x1 && p.y() == y1)
+							.filter(pixel -> pixel.p().equals(pos))
 							.findFirst()
 							.map(p -> p.c())
 							.orElse(' ');
@@ -137,7 +135,7 @@ class App {
 			final var y = rs.getInt(2);
 			final var c = rs.getString(3).charAt(0);
 
-			pixels.add(new Pixel(x, y, c));
+			pixels.add(new Pixel(new Position(x, y), c));
 		}
 
 		st.close();
