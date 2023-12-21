@@ -6,6 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
+class Env {
+	public static final String DB_URL = "jdbc:postgresql://hera.hs-regensburg.de/jun31399?currentSchema=asciiplace";
+	public static final String DB_USER = "jun31399";
+	public static final String DB_PASS = "jadmsfvhetgthtekjrjeuheasddoucqy";
+
+	public static final int SCREEN_WIDTH = 35;
+	public static final int SCREEN_HEIGHT = 9;
+}
+
 record Position(int x, int y) {
 }
 
@@ -16,12 +25,6 @@ record Bounds(int xMin, int xMax, int yMin, int yMax) {
 }
 
 class App {
-	public static final String DB_URL = "jdbc:postgresql://hera.hs-regensburg.de/jun31399?currentSchema=asciiplace";
-	public static final String DB_USER = "jun31399";
-	public static final String DB_PASS = "jadmsfvhetgthtekjrjeuheasddoucqy";
-
-	public static final int SCREEN_WIDTH = 35;
-	public static final int SCREEN_HEIGHT = 9;
 
 	public static Connection connection;
 
@@ -57,10 +60,10 @@ class App {
 
 		while (true) {
 			final var bounds = new Bounds(
-					data.x - SCREEN_WIDTH / 2,
-					data.x + SCREEN_WIDTH / 2,
-					data.y - SCREEN_HEIGHT / 2,
-					data.y + SCREEN_HEIGHT / 2);
+					data.x - Env.SCREEN_WIDTH / 2,
+					data.x + Env.SCREEN_WIDTH / 2,
+					data.y - Env.SCREEN_HEIGHT / 2,
+					data.y + Env.SCREEN_HEIGHT / 2);
 
 			final var pixels = fetch(bounds);
 
@@ -82,7 +85,7 @@ class App {
 
 	public static void init() {
 		try {
-			connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+			connection = DriverManager.getConnection(Env.DB_URL, Env.DB_USER, Env.DB_PASS);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.exit(1);
