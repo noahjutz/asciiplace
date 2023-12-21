@@ -121,10 +121,8 @@ class App {
 		var st = connection.prepareStatement("""
 				SELECT DISTINCT ON (x, y) x, y, c
 				FROM pixels
-				WHERE x >= ?
-				AND x < ?
-				AND y >= ?
-				AND y < ?
+				WHERE x >= ? AND x < ?
+				AND y >= ? AND y < ?
 				ORDER BY x, y, created_at DESC;
 				""");
 
@@ -132,15 +130,10 @@ class App {
 		st.setInt(2, bounds.xMax());
 		st.setInt(3, bounds.yMin());
 		st.setInt(4, bounds.yMax());
-		var rs = st.executeQuery();
-		while (rs.next()) {
-			final var x = rs.getInt(1);
-			final var y = rs.getInt(2);
-			final var c = rs.getString(3).charAt(0);
 
-			final var pixel = new Pixel(x, y, c);
-			pixels.add(pixel);
-		}
+		var rs = st.executeQuery();
+		while (rs.next())
+			pixels.add(new Pixel(rs.getInt(1), rs.getInt(2), rs.getString(3).charAt(0)));
 
 		st.close();
 		rs.close();
@@ -149,9 +142,7 @@ class App {
 	}
 
 	static void write(Position position, char c) throws SQLException {
-		var st = connection.prepareStatement("""
-				INSERT INTO pixels (x, y, c) VALUES (?, ?, ?)
-				""");
+		var st = connection.prepareStatement("INSERT INTO pixels (x, y, c) VALUES (?, ?, ?)");
 		System.out.println(c);
 		st.setInt(1, position.x());
 		st.setInt(2, position.y());
