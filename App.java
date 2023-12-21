@@ -19,6 +19,14 @@ record Position(int x, int y) {
 }
 
 record Pixel(Position position, char c) {
+	static char charAt(Pixel[] pixels, Position position) {
+		return Arrays.stream(pixels)
+				.filter(pixel -> pixel.position().equals(position))
+				.findFirst()
+				.map(pixel -> pixel.c())
+				.orElse(' ');
+
+	}
 }
 
 record Bounds(int xMin, int xMax, int yMin, int yMax) {
@@ -91,16 +99,7 @@ class App {
 			for (int x = bounds.xMin(); x < bounds.xMax(); x++) {
 				final var currentPos = new Position(x, y);
 
-				char c = 'X';
-
-				if (!playerPos.equals(currentPos)) {
-					c = Arrays.stream(pixels)
-							.filter(pixel -> pixel.position().equals(currentPos))
-							.findFirst()
-							.map(pixel -> pixel.c())
-							.orElse(' ');
-				}
-
+				char c = playerPos.equals(currentPos) ? 'X' : Pixel.charAt(pixels, currentPos);
 				System.out.print(c);
 			}
 			System.out.println();
